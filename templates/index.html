@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie API</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+</head>
+<body>
+  <h1>Movie API</h1>
+  <ul id="movie-list">
+    {% for movie in movies %}
+      <li id="movie-{{ movie.id }}">
+        {{ movie.genre }} - {{ movie.judul }} - {{ movie.deskripsi }}
+        <a href="#" data-id="{{ movie.id }}" class="edit-button">Edit</a>
+        <a href="#" data-id="{{ movie.id }}" class="delete-button" onclick="return confirm('Are you sure you want to delete this movie?')">Delete</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h2>Add Movie</h2>
+  <form method="POST" action="/api">
+    <label for="genre">Genre:</label>
+    <input type="text" id="genre" name="genre" required>
+
+    <label for="judul">Judul:</label>
+    <input type="text" id="judul" name="judul" required>
+
+    <label for="deskripsi">Deskripsi:</label>
+    <textarea id="deskripsi" name="deskripsi" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    $(document).ready(function() {
+      $('.edit-button').click(function(e) {
+        e.preventDefault();
+        const movieId = $(this).data('id');
+        // Load edit form with movie data (optional)
+        // ...
+
+        // Send AJAX request to edit movie
+        $.ajax({
+          url: '/api/' + movieId,
+          type: 'PUT',
+          // Replace with actual form data for editing
+          data: {
+            genre: 'New Genre', // Replace with actual genre input
+            judul: 'New Judul', // Replace with actual judul input
+            deskripsi: 'New Deskripsi' // Replace with actual deskripsi input
+          },
+          success: function(response) {
+            if (response.code === 200) {
+              // Update movie list on UI (optional)
+              // ...
+              alert('Movie edited successfully!');
+            } else {
+              alert('Failed to edit movie!');
+            }
+          },
+          error: function(error) {
+            console.error('Error editing movie:', error);
+          }
+        });
+      });
+
+      $('.delete-button').click(function(e) {
+        // No need to prevent default here as confirmation is handled by onclick attribute
+        const movieId = $(this).data('id');
+
+        $.ajax({
+          url: '/api/' + movieId,
+          type: 'DELETE',
+          success: function(response) {
+            if (response.code === 200) {
+              // Remove movie from UI
+              $('#movie-' + movieId).remove();
+              alert('Movie deleted successfully!');
+            } else {
+              alert('Failed to delete movie!');
+            }
+          },
+          error: function(error) {
+            console.error('Error deleting movie:', error);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
